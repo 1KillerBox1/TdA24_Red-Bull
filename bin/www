@@ -1,9 +1,5 @@
 #!/usr/bin/env node
-
-/**
- * Module dependencies.
- */
-
+// filepath: /c:/Users/ondre/OneDrive/Dokumenty/GitHub/TdA24_RedBull/bin/www
 var app = require('../app');
 var debug = require('debug')('expressjs-boilerplate:server');
 var http = require('http');

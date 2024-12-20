@@ -3,21 +3,35 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-// setting the sqlite to verbose debugging mode (https://github.com/TryGhost/node-sqlite3/wiki/Debugging)
-const sqlite3 = require('sqlite3').verbose();
-// creates database with fileneme db.sqlite in directory './data/'
-const fs = require("node:fs");
-if(!fs.existsSync(path.join(__dirname, 'data'))){
-  // create data directory if it does not exist
-  fs.mkdirSync(path.join(__dirname, 'data'));
-}
-const db = new sqlite3.Database(path.join(__dirname, 'data','db.sqlite'));
+var sqlite3 = require('sqlite3').verbose();
+var fs = require('fs');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var apiRouter = require('./routes/api');
 
 var app = express();
 
+// Ensure the data directory exists
+if (!fs.existsSync(path.join(__dirname, 'data'))) {
+  fs.mkdirSync(path.join(__dirname, 'data'));
+}
+
+// Database setup
+var db = new sqlite3.Database(path.join(__dirname, 'data', 'db.sqlite'), (err) => {
+  if (err) {
+    console.error('Could not connect to database', err);
+  } else {
+    console.log('Connected to database');
+  }
+});
+
+// Create the tourdeapp table if it doesn't exist
+db.run('CREATE TABLE IF NOT EXISTS tourdeapp (record TEXT)', (err) => {
+  if (err) {
+    console.error('Could not create table', err);
+  }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,14 +45,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api', apiRouter); // Add this line
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = process.env.ENV === 'development' ? err : {};
@@ -47,9 +62,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-// creates the tourdeapp table in the databace
-db.run('CREATE TABLE IF NOT EXISTS tourdeapp (record TEXT)');
-db.close();
 
 module.exports = app;
