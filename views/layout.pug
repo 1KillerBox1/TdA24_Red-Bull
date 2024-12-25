@@ -3,6 +3,22 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-  body
+    script(src='/javascript/main.js')
+  body(class="body")
+    center
+      div(class="hlavicka" data-text="PIŠKVORKY")
+        span P
+        span I
+        span Š
+        span K
+        span V
+        span O
+        span R
+        span K
+        span Y
+    center
+      div(class="Plocha")
+        div(class="board" id="board")
+        div(class="message" id="message") Hráč X začíná
+    a(class="button" type="button" href="" id="reset") Nová hra 
     block content
-    h1 Hello TdA
